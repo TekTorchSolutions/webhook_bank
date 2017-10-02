@@ -1,0 +1,7 @@
+Flask==0.12.2
+Flask-PyMongo==0.5.1
+numpy==1.11.1
+stop_words
+certifi
+elasticsearch==5.4.0
+textblob==0.13.0
