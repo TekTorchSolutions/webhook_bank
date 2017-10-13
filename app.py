@@ -19,7 +19,7 @@ with app.app_context():
     credit_card_faqs = mongo.db["credit_card_faqs"]
 
 
-es=Elasticsearch(['https://elastic:b1mM7g19FuqswhJI4CJyUrgI@6d04740f431039a0c1af90f4fbb95ea6.ap-southeast-1.aws.found.io:9243/'])
+es=Elasticsearch(['https://elastic:8bZ4TNUt3D9sQccRJN20rvnB@https://c44a103fa2336523e9f96d1f60c46497.us-east-1.aws.found.io:9243/'])
 #constants
 INDEX_NAME="bank_data"
 TYPE="faqs"
@@ -45,6 +45,7 @@ def check_db():
         }
         yield (doc)
 bulk(es,check_db(),stats_only=True,raise_on_error=False)
+print("hi")
 
 
 @app.route('/webhook', methods=['POST'])
@@ -98,6 +99,9 @@ def spell_check(query):
     #searching freq_dict in db
     dict_collection=mongo.db["dict_collection"]
     freq_dict=dict_collection.find_one({"name":"freq_dict"})["freq_dict"]
+    #stop words
+    stop_words=get_stop_words("en")
+    stop_words.append("can")
     #for each word in splitted query
     for word in splitted_query:
         #convert to testblob word
@@ -121,7 +125,7 @@ def spell_check(query):
             else:
                 frequency = 0
             #keeping highest frequency and corresponding word in record
-            if frequency >= freq_counter:
+            if frequency >= freq_counter and p[0] not in stop_words:
                 freq_counter = frequency
                 corrected_word = p[0]
         #no correction was present in dictionary
