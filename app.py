@@ -9,6 +9,7 @@ import string
 from textblob import Word
 import json
 import os
+from search import tf_idf_score
 
 app = Flask(__name__)
 
@@ -17,8 +18,11 @@ app.config["MONGO_URI"] = "mongodb://admin:admin@ds111204.mlab.com:11204/bankfaq
 mongo = PyMongo(app)
 with app.app_context():
     credit_card_faqs = mongo.db["credit_card_faqs"]
+documents=[]
+for faq in credit_card_faqs.find():
+    documents.append(faq["answer"])
 
-
+"""""
 es=Elasticsearch(['https://elastic:OlnHeVRGGVBvIfDPNCIXt9SN@c44a103fa2336523e9f96d1f60c46497.us-east-1.aws.found.io:9243/'])
 #constants
 INDEX_NAME="bank_data"
@@ -45,6 +49,7 @@ def check_db():
         }
         yield (doc)
 bulk(es,check_db(),stats_only=True,raise_on_error=False)
+"""""
 print("hi")
 
 
@@ -66,6 +71,7 @@ def webhook():
     #spell check query
     final_query=spell_check(query)
     print(final_query)
+    """""
     result = es.search(index=INDEX_NAME, doc_type=TYPE, body={"query": {"match": {"text": final_query.strip()}}})
 
     if result.get('hits') is not None and len(result['hits'].get('hits')) is not 0:
@@ -74,9 +80,10 @@ def webhook():
         response=(result['hits']['hits'][0]['_source']['text'])
     else:
         response="I could not quite comprehend it!Could you be any more vague?!!!"
+    """""
 
 
-    #response = tf_idf_score(query, documents)
+    response = tf_idf_score(query, documents)
     print(response)
 
     res = {
