@@ -20,7 +20,7 @@ with app.app_context():
     credit_card_faqs = mongo.db["credit_card_faqs"]
 
 
-es=Elasticsearch(['https://elastic:OlnHeVRGGVBvIfDPNCIXt9SN@c44a103fa2336523e9f96d1f60c46497.us-east-1.aws.found.io:9243/'])
+es=Elasticsearch(['https://elastic:OvVHqbdDFjijFLdykewFwwYv@f40b0c3c4a8c2a8d96d62594e43db0f8.us-east-1.aws.found.io:9243/'])
 #constants
 INDEX_NAME="bank_data"
 TYPE="faqs"
@@ -37,7 +37,7 @@ def check_db():
             '_id': str(faq["_id"]),
 
             "doc":{
-                'text': faq['answer']
+                'text': faq['question']
             },
             "doc_as_upsert":True
 
@@ -72,9 +72,13 @@ def webhook():
     if result.get('hits') is not None and len(result['hits'].get('hits')) is not 0:
         print(result.get('hits'))
         print(result['hits'].get('hits'))
-        response=(result['hits']['hits'][0]['_source']['text'])
+        response_q=(result['hits']['hits'][0]['_source']['text'])
+        doc=credit_card_faqs.find_one({"question":response_q})
+        response=doc["answer"]
+
     else:
         response="I could not quite comprehend it!Could you be any more vague?!!!"
+
 
 
     #response = tf_idf_score(query, documents)
