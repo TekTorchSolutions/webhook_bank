@@ -74,7 +74,7 @@ def webhook():
         print(result['hits'].get('hits'))
         response_q=(result['hits']['hits'][0]['_source']['text'])
         doc=credit_card_faqs.find_one({"question":response_q})
-        response=doc["answer"]
+        response=doc["answer"] + " ["+doc["context"]+"] "
 
     else:
         response="I could not quite comprehend it!Could you be any more vague?!!!"
