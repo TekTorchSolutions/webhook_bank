@@ -17,7 +17,7 @@ app.config['MONGO_DBNAME'] = 'bankfaq'
 app.config["MONGO_URI"] = "mongodb://admin:admin@ds111204.mlab.com:11204/bankfaq"
 mongo = PyMongo(app)
 with app.app_context():
-    credit_card_faqs = mongo.db["credit_card_faqs"]
+    credit_card_faqs = mongo.db["context_faqs"]
 
 
 es=Elasticsearch(['https://elastic:OvVHqbdDFjijFLdykewFwwYv@f40b0c3c4a8c2a8d96d62594e43db0f8.us-east-1.aws.found.io:9243/'])
