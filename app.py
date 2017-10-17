@@ -20,7 +20,7 @@ with app.app_context():
     credit_card_faqs = mongo.db["context_faqs"]
 
 
-es=Elasticsearch(['https://elastic:OvVHqbdDFjijFLdykewFwwYv@f40b0c3c4a8c2a8d96d62594e43db0f8.us-east-1.aws.found.io:9243/'])
+es=Elasticsearch(['https://elastic:Vp8uz5NB2RxMREq7MEUVksPG@30f169c4638f90a2fa8a2294d8623207.us-east-1.aws.found.io:9243/'])
 #constants
 INDEX_NAME="bank_data"
 TYPE="faqs"
