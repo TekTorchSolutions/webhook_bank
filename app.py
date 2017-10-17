@@ -74,7 +74,9 @@ def webhook():
         print(result['hits'].get('hits'))
         response_q=(result['hits']['hits'][0]['_source']['text'])
         doc=credit_card_faqs.find_one({"question":response_q})
-        response=doc["answer"] + " ["+doc["context"]+"] "
+
+        #response=doc["answer"] + " ["+doc["context"]+"] "
+        response=doc['context']
 
     else:
         response="I could not quite comprehend it!Could you be any more vague?!!!"
@@ -102,7 +104,7 @@ def spell_check(query):
     #empty list for spell checked query
     corrected_query=[]
     #searching freq_dict in db
-    dict_collection=mongo.db["dict_collection"]
+    dict_collection=mongo.db["context_dict_collection"]
     freq_dict=dict_collection.find_one({"name":"freq_dict"})["freq_dict"]
     #stop words
     stop_words=get_stop_words("en")
