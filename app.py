@@ -18,14 +18,13 @@ app.config["MONGO_URI"] = "mongodb://admin:admin@ds111204.mlab.com:11204/bankfaq
 mongo = PyMongo(app)
 with app.app_context():
     credit_card_faqs = mongo.db["context_faqs"]
+    context_record=mongo.db["context"]
 
 
 es=Elasticsearch(['https://elastic:Vp8uz5NB2RxMREq7MEUVksPG@30f169c4638f90a2fa8a2294d8623207.us-east-1.aws.found.io:9243/'])
 #constants
 INDEX_NAME="bank_data"
 TYPE="faqs"
-
-
 
 def check_db():
     for faq in credit_card_faqs.find():
@@ -46,11 +45,20 @@ def check_db():
         }
         yield (doc)
 bulk(es,check_db(),stats_only=True,raise_on_error=False)
-print("hi")
 
 
 @app.route('/webhook', methods=['POST'])
 def webhook():
+
+
+
+    context=retrieve_context()
+
+    possible_contexts=["common","internet banking",'mobile banking app','home loan','credit card','everyday transaction account','online savings account','term deposit','interestme savings','personal loans','insurance','business term deposit','travel','securecode','mobile banking manager','mistaken internet payment','pin select service','debit mastercard reissue']
+
+
+
+
     req = request.get_json(silent=True, force=True)
     print('Request:', json.dumps(req, indent=4))
     # context=req.get("contexts").get("name")
@@ -66,7 +74,19 @@ def webhook():
     query=remove_punctuation_and_stop_words(query)
     #spell check query
     final_query=spell_check(query)
+    #splitted_query=final_query.split()
+    was_there=False
+    for q in possible_contexts:
+        if q in final_query:
+            set_context(q)
+            was_there=True
+            break
+    if was_there==False:
+        final_query=final_query+" " +context
+
     print(final_query)
+
+
     result = es.search(index=INDEX_NAME, doc_type=TYPE, body={"query": {"match": {"text": final_query.strip()}}})
 
     if result.get('hits') is not None and len(result['hits'].get('hits')) is not 0:
@@ -76,6 +96,7 @@ def webhook():
         doc=credit_card_faqs.find_one({"question":response_q})
 
         response=doc["answer"] + " ["+doc["context"]+"] "
+
         #response=doc['context']
 
     else:
@@ -160,6 +181,31 @@ def remove_punctuation_and_stop_words(query):
             tokenized_query.remove(stop_words[i])
     query = " ".join(tokenized_query)
     return query
+
+
+def retrieve_context():
+    document = context_record.find_one({'purpose': "context_record"})
+    print(document)
+    if document == None:
+        print("hi")
+        context = ""
+    else:
+        print("bye")
+        context = document["context"]
+    return context
+
+
+def set_context(context):
+    doc=context_record.find_one({'purpose':"context_record"})
+    if doc==None:
+        info={'purpose':"context_record",
+               "context":context
+
+        }
+        context_record.insert_one(info)
+    else:
+        doc["context"]=context
+
 
 
 if __name__ == '__main__':
