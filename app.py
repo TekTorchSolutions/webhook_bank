@@ -21,7 +21,7 @@ with app.app_context():
     context_record=mongo.db["context"]
 
 
-es=Elasticsearch(['https://elastic:5DvIHJiomqc9CKn2DJRjzxs4@95f89fef410fb6ba11de51275bc2e6cc.us-east-1.aws.found.io:9243/'])
+es=Elasticsearch(['https://elastic:26DOr8LJ0c4DUTAk23gb698j@159c3a26cdeb89d7f37b2ccce76a9e21.us-east-1.aws.found.io:9243/'])
 #constants
 INDEX_NAME="bank_data"
 TYPE="faqs"
